@@ -36,7 +36,7 @@ const CompletedTask = ({ groupId, task, onComplete }) => {
                     <CIcon
                         icon={cibVerizon}
                         className="mt-1"
-                        onClick={() => onComplete(task, false)}
+                        onClick={() => onComplete(task.taskId)}
                         style={{ cursor: 'pointer' }}
                     />
                 </div>

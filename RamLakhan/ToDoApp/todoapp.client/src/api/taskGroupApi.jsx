@@ -1,11 +1,12 @@
 // src/api/taskGroupApi.jsx
 
-const BASE_URL = '/TaskGroups';
-
+const BASE_URL = '/api/TaskGroups';
+const token = localStorage.getItem('token');
 export const GetGroups = async () => {
     try {
         const response = await fetch(`${BASE_URL}`);
-        return await response.json();
+        const result = await response.json();
+        return result;
 
     } catch (e) {
         return {
@@ -102,6 +103,30 @@ export const GetStarredTask = async () => {
 export const DeleteCompletedTask = async (groupId) => {
     try {
         const response = await fetch(`${BASE_URL}/${groupId}/complete`, { method: 'DELETE' });
+        return await response.json();
+    } catch (e) {
+        return {
+            isSuccess: false,
+            message: e.message,
+        };
+    }
+};
+
+export const UpdateGroupVisibility = async (groupId,isVisible) => {
+    try {
+        const response = await fetch(`${BASE_URL}/${groupId}/visibility/${isVisible}`, { method: 'PATCH' });
+        return await response.json();
+    } catch (e) {
+        return {
+            isSuccess: false,
+            message: e.message,
+        };
+    }
+};
+
+export const UpdateSortBy = async (groupId, sortBy) => {
+    try {
+        const response = await fetch(`${BASE_URL}/${groupId}/sortBy/${sortBy}`, { method: 'PATCH' });
         return await response.json();
     } catch (e) {
         return {

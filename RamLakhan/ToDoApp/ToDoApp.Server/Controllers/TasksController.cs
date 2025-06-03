@@ -1,47 +1,31 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ToDoApp.Server.Contracts;
-using ToDoApp.Server.Models.Entity;
+using ToDoApp.Server.Models;
 
 namespace ToDoApp.Server.Controllers;
 
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiController]
 public class TasksController(ITaskService taskService) : ControllerBase
 {
     #region [Get All Task]
     [HttpGet("")]
-    public async Task<IActionResult> Get()
-    {
-        var response = await taskService.GetAllTaskAsync();
-        if (!response.IsSuccess)
-        {
-            return BadRequest(response);
-        }
-        return Ok(response);
-    }
+    public async Task<IActionResult> Get() => Ok(await taskService.GetAllTaskAsync());
 
     #endregion [Get All Task]
 
     #region [Get Task By Id]
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> Get(int id)
-    {
-        var response = await taskService.GetTaskByIdAsync(id);
-        if (!response.IsSuccess)
-        {
-            return BadRequest(response);
-        }
-        return Ok(response);
-    }
+    public async Task<IActionResult> Get(int id) => Ok(await taskService.GetTaskByIdAsync(id));
 
     #endregion [Get Task By Id]
 
     #region [Add task]
     [HttpPost("")]
-    public async Task<IActionResult> Post([FromBody] Models.Entity.Task model)
+    public async Task<IActionResult> Post([FromBody] AddTaskRequestModel model)
     {
-        var response = await taskService.AddOrUpdateTaskAsync(0,model);
+        var response = await taskService.AddTaskAsync(model);
         if (!response.IsSuccess)
         {
             return BadRequest(response);
@@ -53,29 +37,20 @@ public class TasksController(ITaskService taskService) : ControllerBase
 
     #region [Update task]
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put(int id,[FromBody] Models.Entity.Task model)
+    public async Task<IActionResult> Put(int id, [FromBody] UpdateTaskRequestModel model)
     {
-        var response = await taskService.AddOrUpdateTaskAsync(id,model);
+        var response = await taskService.UpdateTaskAsync(id,model);
         if (!response.IsSuccess)
         {
             return BadRequest(response);
         }
         return Ok(response);
     }
-
     #endregion [Update task]
 
     #region [Delete Task]
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        var response = await taskService.DeleteAsync(id);
-        if (!response.IsSuccess)
-        {
-            return BadRequest(response);
-        }
-        return Ok(response);
-    }
+    public async Task<IActionResult> Delete(int id) => Ok(await taskService.DeleteAsync(id));
 
     #endregion [Delete Task]
 
@@ -92,11 +67,11 @@ public class TasksController(ITaskService taskService) : ControllerBase
     }
     #endregion [Toggle Star Task]
 
-    #region [Move Task To New List]
+    #region [Move Task To New Group]
     [HttpPatch("{taskId}/move")]
-    public async Task<IActionResult> MoveTaskToNewList(int taskId, [FromBody] TaskGroup group)
+    public async Task<IActionResult> MoveTaskToNewGroup(int taskId, [FromBody] AddGroupRequestModel model)
     {
-        var response = await taskService.MoveTaskToNewList(taskId, group);
+        var response = await taskService.MoveTaskToNewGroup(taskId, model);
         if (!response.IsSuccess)
         {
             return BadRequest(response);
@@ -104,5 +79,32 @@ public class TasksController(ITaskService taskService) : ControllerBase
         return Ok(response);
     }
     #endregion [Move Task To New List]
+
+    #region [Move Task To Existing Group]
+    [HttpPatch("{taskId}/move/{groupId}")]
+    public async Task<IActionResult> MoveTaskToExistingGroup(int taskId, int groupId)
+    {
+        var response = await taskService.MoveTaskToExistingGroupAsync(taskId, groupId);
+        if (!response.IsSuccess)
+        {
+            return BadRequest(response);
+        }
+        return Ok(response);
+    }
+    #endregion [Move Task To Existing Group]
+
+    #region [Toggle Complete Task]
+    [HttpPatch("{taskId}/complete")]
+    public async Task<IActionResult> UpdateTaskCompletionStatus(int taskId)
+    {
+        var response = await taskService.UpdateTaskCompletionStatusAsync(taskId);
+        if (!response.IsSuccess)
+        {
+            return BadRequest(response);
+        }
+        return Ok(response);
+    }
+    #endregion [Toggle Complete Task]
+
 }
 

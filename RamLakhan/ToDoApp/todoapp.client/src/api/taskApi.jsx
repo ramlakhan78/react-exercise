@@ -1,6 +1,6 @@
 
-const BASE_URL = '/Tasks';
-
+const BASE_URL = '/api/Tasks';
+const token = localStorage.getItem('token');
 export const GetTaskList = async () => {
     try {
         const response = await fetch(`${BASE_URL}`);
@@ -72,10 +72,39 @@ export const ToggleStarTask = async (taskId) => {
     }
 };
 
+export const UpdateTaskCompletionStatus = async (taskId) => {
+    try {
+        const response = await fetch(`${BASE_URL}/${taskId}/complete`, {
+            method: 'PATCH'
+        });
+        return await response.json();
+
+    } catch (e) {
+        return {
+            isSuccess: false,
+            message: e.message,
+        };
+    }
+};
+
 export const DeleteTask = async (taskId) => {
     try {
         const response = await fetch(`${BASE_URL}/${taskId}`, {
             method: 'DELETE'
+        });
+        return await response.json();
+    } catch (e) {
+        return {
+            isSuccess: false,
+            message: e.message,
+        };
+    }
+};
+
+export const MoveTaskToExistingGroup = async (taskId, groupId) => {
+    try {
+        const response = await fetch(`${BASE_URL}/${taskId}/move/${groupId}`, {
+            method: 'PATCH'
         });
         return await response.json();
     } catch (e) {

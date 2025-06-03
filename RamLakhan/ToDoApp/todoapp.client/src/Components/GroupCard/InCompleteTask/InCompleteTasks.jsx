@@ -30,7 +30,7 @@ const InCompleteTasks = ({ groupId, task, onComplete }) => {
     return (
         <>
             <CListGroupItem className={`d-flex justify-content-between align-items-start position-relative task-item `}>
-                <CFormCheck type="radio" style={{ cursor: 'pointer' }} onClick={() => onComplete(task, true)} />
+                <CFormCheck type="radio" style={{ cursor: 'pointer' }} onClick={() => onComplete(task.taskId)} />
                 <div className="flex-grow-1 text-wrap text-break" onClick={() => handleEditTask(task.taskId)} style={{ cursor: 'pointer' }}>
 
                     <div className="ms-4">{task.title}</div>

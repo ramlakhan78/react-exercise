@@ -11,8 +11,8 @@ const AddOrUpdateGroups = ({ visible, setVisibility, groupId, taskIdToMove }) =>
     const [disable, setDisable] = useState(false);
     const [isShowError, setIsShowError] = useState(false);
     const [groupName, setGroupName] = useState('');
-    const [groupData, setGroupData] = useState({});
     const [responseError, setResponseError] = useState(null);
+    const [validationErrors, setValidationErrors] = useState({});
 
     useEffect(() => {
         (async () => {
@@ -21,8 +21,7 @@ const AddOrUpdateGroups = ({ visible, setVisibility, groupId, taskIdToMove }) =>
                 if (res.isSuccess) {
 
                     let itemToEdit = res.data;
-                    setGroupName(itemToEdit.listName ?? '');
-                    setGroupData(itemToEdit);
+                    setGroupName(itemToEdit.groupName ?? '');
                 }
             }
 
@@ -35,7 +34,7 @@ const AddOrUpdateGroups = ({ visible, setVisibility, groupId, taskIdToMove }) =>
         let response = {}
 
         if (taskIdToMove && taskIdToMove != null && taskIdToMove != undefined && taskIdToMove > 0) {
-            response = await MoveTaskToNewGroup(taskIdToMove, { listId: 0, listName: groupName, isEnableShow: true, sortBy: 'My order' });
+            response = await MoveTaskToNewGroup(taskIdToMove, { groupName: groupName});
             if (!response.isSuccess) {
                 console.error("error while moving task to new group ", response);
                 setResponseError(response.message);
@@ -46,12 +45,17 @@ const AddOrUpdateGroups = ({ visible, setVisibility, groupId, taskIdToMove }) =>
         } else {
 
             if (groupId > 0) {
-                response = await UpdateGroup(groupId, { ...groupData, listName: groupName });
+                response = await UpdateGroup(groupId, { groupName: groupName });
             } else {
-                response = await AddGroup({ listId: 0, listName: groupName, isEnableShow: true, sortBy: 'My order' });
+                response = await AddGroup({groupName: groupName});
             }
 
             if (!response.isSuccess) {
+                if (response?.status === 400 && response?.errors) {
+                    setValidationErrors(response?.errors)
+                } else {
+                    setResponseError(response.message);
+                }
                 console.log("Error while adding or updating group", response);
                 setResponseError(response.message);
                 setDisable(false);
@@ -121,6 +125,7 @@ const AddOrUpdateGroups = ({ visible, setVisibility, groupId, taskIdToMove }) =>
                 Name: <input type="text" autoFocus className="form-control" value={groupName} onChange={(e) => handleErrorAddGroup(e.target.value)} />
                 <br />
                 <span className={`${isShowError == false ? "d-none" : ""} text-danger`}>please enter value</span>
+                {validationErrors.GroupName && (<span className="text-danger">{validationErrors.GroupName[0]}</span>)}
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={() => handleClose()}>

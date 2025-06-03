@@ -14,9 +14,9 @@ const AddOrUpdateTask = ({ visible, setVisibility, taskId, setTaskId, groupId, i
     const [description, setDescription] = useState('');
     const [date, setDate] = useState('');
     const [isShowError, setIsShowError] = useState(false);
-    const [editTaskItem, setEditTaskItem] = useState([]);
     const [selectedGroupId, setSelectedGroupId] = useState(1);
     const [responseError, setResponseError] = useState(null);
+    const [validationErrors, setValidationErrors] = useState({});
 
 
     useEffect(() => {
@@ -28,7 +28,6 @@ const AddOrUpdateTask = ({ visible, setVisibility, taskId, setTaskId, groupId, i
                     setTitle(itemToEdit.title ?? '');
                     setDescription(itemToEdit.description ?? '');
                     setDate(itemToEdit.toDoDate ?? '');
-                    setEditTaskItem(itemToEdit);
                 }
             }
         })();
@@ -45,18 +44,22 @@ const AddOrUpdateTask = ({ visible, setVisibility, taskId, setTaskId, groupId, i
         const toDoDate = date?.trim() ? date : null;
 
         if (taskId > 0) {
-            response = await UpdateTask(taskId, { ...editTaskItem, title: title, description: description, toDoDate: toDoDate });
+            response = await UpdateTask(taskId, { title: title, description: description, toDoDate: toDoDate });
         } else {
             const isStarred = isStarredTask === null || isStarredTask === undefined || !isStarredTask ? false : isStarredTask;
             const taskGroupId = groupId > 0 ? groupId : selectedGroupId;
-            response = await AddTask({ taskId: 0, title: title, description: description, toDoDate: toDoDate, taskGroupId: taskGroupId, isStarred: isStarred });
+            response = await AddTask({ title: title, description: description, toDoDate: toDoDate, taskGroupId: taskGroupId, isStarred: isStarred });
         }
 
         setDisable(false);
 
         if (!response.isSuccess) {
+            if (response?.status === 400 && response?.errors) {
+                setValidationErrors(response?.errors)
+            } else {
+                setResponseError(response.message);
+            }
             console.log("Error while adding or updating task", response);
-            setResponseError(response.message);
             return;
         }
 
@@ -87,6 +90,7 @@ const AddOrUpdateTask = ({ visible, setVisibility, taskId, setTaskId, groupId, i
         <Modal show={visible} onHide={() => handleClose()}>
             <Modal.Header closeButton>
                 <Modal.Title>{taskId > 0 ? "Edit task" : "Add task"}</Modal.Title>
+                {validationErrors.Title && (<span className="text-danger">{validationErrors.Title[0]}</span>)}
             </Modal.Header>
             {responseError && <p className=" text-center mt-2 mb-0 text-danger">{responseError}</p>}
             <Modal.Body>
@@ -135,9 +139,13 @@ const AddOrUpdateTask = ({ visible, setVisibility, taskId, setTaskId, groupId, i
                                 <Form.Select
                                     onChange={(e) => setSelectedGroupId(e.target.value)} aria-label="Default select example">
                                     {taskGroups.map((item) => (
-                                        <option key={item.listId} value={item.listId}>{item.listName}</option>
+                                        <option key={item.groupId} value={item.groupId}>{item.groupName}</option>
                                     ))}
                                 </Form.Select>
+
+                                {validationErrors.TaskGroupId && (
+                                    <span className="text-danger">{validationErrors.TaskGroupId[0]}</span>
+                                )}
                             </Form.Group>
                             : ''
                     }

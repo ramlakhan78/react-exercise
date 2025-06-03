@@ -20,6 +20,13 @@
 .dropdown-menu .dropdown-item {
     cursor: pointer
 }
+.card-body .add-task-button {
+    border-radius: 10px;
+    padding: 2px 0px 4px 5px;
+}
+.card-body .add-task-button:hover {
+    background-color: rgba(224, 224, 224, 0.28);
+}
 
 .task-menu,
 .star-div, .trash-icon-complete-section {
