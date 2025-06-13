@@ -4,7 +4,6 @@ using ToDoApp.Server.Contracts;
 using ToDoApp.Server.Models;
 
 namespace ToDoApp.Server.Controllers;
-[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class TaskGroupsController(ITaskGroupService taskGroupService) : ControllerBase

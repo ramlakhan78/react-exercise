@@ -1,7 +1,7 @@
 // src/api/taskGroupApi.jsx
 
 const BASE_URL = '/api/TaskGroups';
-const token = localStorage.getItem('token');
+//const token = localStorage.getItem('token');
 export const GetGroups = async () => {
     try {
         const response = await fetch(`${BASE_URL}`);
